@@ -25,3 +25,9 @@
 	Verify the installation `aws-iam-authenticator help`
 
 3. Install awscli `sudo apt install python-pip awscli`
+4. Install eksctl
+	```
+	curl --silent --location "https://github.com/weaveworks/eksctl/releases/download/latest_release/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp
+	sudo mv /tmp/eksctl /usr/local/bin
+	```
+	Verify the installation `eksctl help`
