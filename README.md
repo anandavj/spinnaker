@@ -31,3 +31,54 @@
 	sudo mv /tmp/eksctl /usr/local/bin
 	```
 	Verify the installation `eksctl help`
+
+5. Create an Amazon EKS cluster for Spinnaker `eksctl create cluster --name=eks-spinnaker --nodes=2 --region=ap-southeast-1  --write-kubeconfig=false`
+6. Retrieve Amazon EKS cluster kubectl contexts `aws eks update-kubeconfig --name eks-spinnaker --region ap-southeast-1 --alias eks-spinnaker`
+7. Add and configure Kubernetes accounts 
+	```
+	# Enable the Kubernetes provider
+	hal config provider kubernetes enable
+	
+	# Set the current kubectl context to the cluster for Spinnaker
+	kubectl config use-context eks-spinnaker
+	
+	# Assign the Kubernetes context to CONTEXT
+	CONTEXT=$(kubectl config current-context)
+	```
+8. Create Kube namespace `kubectl create namespace spinnaker`
+9. Create [service-account.yml](https://github.com/anandavj/spinnaker/blob/main/service-account.yml)
+10. create a service account for the Amazon EKS cluster `kubectl apply --context $CONTEXT -f service-account.yml`
+11. Extract the secret token of the created spinnaker-service-account
+    ```
+    TOKEN=$(kubectl get secret --context $CONTEXT \
+    $(kubectl get serviceaccount spinnaker-service-account \
+       --context $CONTEXT \
+       -n spinnaker \
+       -o jsonpath='{.secrets[0].name}') \
+       -n spinnaker \
+       -o jsonpath='{.data.token}' | base64 --decode)
+    ```
+12. Set the user entry in kubeconfig
+   ```
+   kubectl config set-credentials ${CONTEXT}-token-user --token $TOKEN
+   kubectl config set-context $CONTEXT --user ${CONTEXT}-token-user
+   ```
+13. Add eks-spinnaker cluster as a Kubernetes provider `hal config provider kubernetes account add eks-spinnaker --context $CONTEXT`
+14. Enable artifact support `hal config features edit --artifacts true`
+15. Configure Spinnaker to install in Kubernetes `hal config deploy edit --type distributed --account-name eks-spinnaker`
+16. Configure Spinnaker to use AWS S3
+   ```
+   export YOUR_ACCESS_KEY_ID=<access-key>
+   hal config storage s3 edit --access-key-id $YOUR_ACCESS_KEY_ID \
+   --secret-access-key --region us-west-2
+   ```
+17. set the storage source to S3 `hal config storage edit --type s3`
+18. List Version `hal version list`
+19. Configure Halyard Spinnaker Version
+   ```
+   export VERSION=1.19.2
+   hal config version edit --version $VERSION
+   ```
+20. Don't forget to give all permission to .kube `chmod -R 777 ./`
+21. Install Spinnaker on the eks-spinnaker Amazon EKS cluster `hal deploy apply`
+22. Verify the installation `kubectl -n spinnaker get svc`
