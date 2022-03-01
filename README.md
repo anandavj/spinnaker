@@ -23,3 +23,5 @@
 	echo 'export PATH=$HOME/bin:$PATH' >> ~/.bashrc
 	```
 	Verify the installation `aws-iam-authenticator help`
+
+3. Install awscli `sudo apt install python-pip awscli`
