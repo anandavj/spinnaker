@@ -70,7 +70,7 @@
    ```
    export YOUR_ACCESS_KEY_ID=<access-key>
    hal config storage s3 edit --access-key-id $YOUR_ACCESS_KEY_ID \
-   --secret-access-key --region us-west-2
+   --secret-access-key --region ap-southeast-1
    ```
 17. set the storage source to S3 `hal config storage edit --type s3`
 18. List Version `hal version list`
