@@ -2,7 +2,6 @@
     "Version": "2012-10-17",
     "Statement": [
         {
-            "Sid": "VisualEditor0",
             "Effect": "Allow",
             "Action": [
                 "iam:GetRole",
@@ -19,7 +18,6 @@
             "Resource": "*"
         },
         {
-            "Sid": "VisualEditor0",
             "Effect": "Allow",
             "Action": "eks:*",
             "Resource": "*"
@@ -33,7 +31,6 @@
             "Resource": "*"
         },
         {
-            "Sid": "VisualEditor0",
             "Effect": "Allow",
             "Action": [
                 "cloudformation:ListStacks",
@@ -42,7 +39,7 @@
                 "cloudformation:DescribeStacks"
             ],
             "Resource": "*"
-        }
+        },
         {
             "Action": "ec2:*",
             "Effect": "Allow",
