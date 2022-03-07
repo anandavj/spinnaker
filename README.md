@@ -32,7 +32,7 @@
 	```
 	Verify the installation `eksctl help`
 
-5. Create an Amazon EKS cluster for Spinnaker `eksctl create cluster --name=eks-spinnaker --nodes=2 --region=ap-southeast-1  --write-kubeconfig=false`
+5. Create an Amazon EKS cluster for Spinnaker `eksctl create cluster --name=eks-spinnaker --tags spinnaker=test --nodes=2 --region=ap-southeast-1  --write-kubeconfig=false`
 6. Retrieve Amazon EKS cluster kubectl contexts `aws eks update-kubeconfig --name eks-spinnaker --region ap-southeast-1 --alias eks-spinnaker`
 7. Add and configure Kubernetes accounts 
 	```
