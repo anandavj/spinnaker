@@ -86,3 +86,58 @@
 	```
 21. Install Spinnaker on the eks-spinnaker Amazon EKS cluster `hal deploy apply`
 23. Verify the installation `kubectl -n spinnaker get svc`
+24. Expose Spinnaker using Elastic Load Balancer
+	```
+	export NAMESPACE=spinnaker
+	# Expose Gate and Deck
+	kubectl -n ${NAMESPACE} expose service spin-gate --type LoadBalancer \
+	  --port 80 --target-port 8084 --name spin-gate-public
+
+	kubectl -n ${NAMESPACE} expose service spin-deck --type LoadBalancer \
+	  --port 80 --target-port 9000 --name spin-deck-public
+
+	export API_URL=$(kubectl -n $NAMESPACE get svc spin-gate-public \
+	 -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
+
+	export UI_URL=$(kubectl -n $NAMESPACE get svc spin-deck-public \
+	 -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
+
+	# Configure the URL for Gate
+	hal config security api edit --override-base-url http://${API_URL}
+
+	# Configure the URL for Deck
+	hal config security ui edit --override-base-url http://${UI_URL}
+
+	# Apply your changes to Spinnaker
+	hal deploy apply
+	```
+25. Get the Deck URL `kubectl -n $NAMESPACE get svc spin-deck-public -o jsonpath='{.status.loadBalancer.ingress[0].hostname}'`
+
+# Jenkins Installation (Different Droplet / Cloud)
+1. Update package `sudo apt-get update -y && sudo apt-get upgrade`
+2. Install JDK `sudo apt install default-jdk -y`
+3. Get Jenkins Installation Package and Install
+	```
+	curl -fsSL https://pkg.jenkins.io/debian-stable/jenkins.io.key | sudo tee   /usr/share/keyrings/jenkins-keyring.asc > /dev/null
+	echo deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc]   https://pkg.jenkins.io/debian-stable binary/ | sudo tee   /etc/apt/sources.list.d/jenkins.list > /dev/null
+	sudo apt-get update
+	sudo apt-get install jenkins
+	```
+4. Start Jenkins Service `sudo service jenkins start`
+5. Go to the UI `<DropletURL>:8080`
+6. get first-time Password `cat /var/lib/jenkins/secrets/initialAdminPassword`
+7. Install Plugins
+
+# Jenkin and Spinnaker Integration
+1. Enable the Jenkin Master `hal config ci jenkins enable`
+2. Add Jenkins Master named **my-jenkins-master**
+	```
+	export BASEURL=<Your Jenkin's URL>
+	export USERNAME=<Your Jenkin's username>
+	hal config ci jenkins master add my-jenkins-master \
+	    --address $BASEURL \
+	    --username $USERNAME \
+	    --password
+	```
+3. Configure Halyard to enable the csrf flag `hal config ci jenkins master edit MASTER --csrf true`
+4. Apply changes `hal deploy apply`
