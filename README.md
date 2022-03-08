@@ -24,7 +24,7 @@
 	```
 	Verify the installation `aws-iam-authenticator help`
 
-3. Install awscli `sudo apt install python-pip awscli` then configure aws by `aws configure`
+3. Install awscli `sudo apt install python-pip awscli` then configure aws by `aws configure`. **Don't forget to enable [these policies](https://github.com/anandavj/spinnaker/blob/main/aws-policy.json) if you use non-root aws user before continuing the step**
 4. Install eksctl
 	```
 	curl --silent --location "https://github.com/weaveworks/eksctl/releases/download/0.85.0/eksctl_Linux_amd64.tar.gz" | tar xz -C /tmp
